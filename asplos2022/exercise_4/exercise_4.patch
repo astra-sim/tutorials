@@ -1,0 +1,286 @@
+diff --git astra-sim/workload/Workload.cc astra-sim/workload/Workload.cc
+index 7f067c7..e87d704 100644
+--- astra-sim/workload/Workload.cc
++++ astra-sim/workload/Workload.cc
+@@ -86,6 +86,8 @@ void Workload::call(EventType event, CallData* data) {
+   }
+   if (parallelismPolicy == ParallelismPolicy::Data) {
+     iterate_data_parallel();
++  } else if (parallelismPolicy == ParallelismPolicy::DataReorder) {
++    iterate_data_parallel_reorder();
+   } else if (parallelismPolicy == ParallelismPolicy::Transformer) {
+     iterate_hybrid_parallel_Transformer();
+   } else if (
+@@ -202,6 +204,8 @@ void Workload::iterate_data_parallel() {
+         // "<<counter<<std::endl;
+       }
+       delay_loaded = true;
++      if (generator->id == 0)
++        std::cout << "[TUTORIAL] FWD[" << index <<"]" << std::endl;
+     }
+     if (counter > 0) {
+       if (generator->id == 0) {
+@@ -228,6 +232,8 @@ void Workload::iterate_data_parallel() {
+     if (delay_loaded == false) {
+       counter = layers[index]->get_weight_grad_compute();
+       delay_loaded = true;
++      if (generator->id == 0)
++        std::cout << "[TUTORIAL] BWD_WG[" << index <<"]" << std::endl;
+     }
+     if (counter > 0) {
+       generator->try_register_event(
+@@ -256,6 +262,8 @@ void Workload::iterate_data_parallel() {
+     if (delay_loaded == false) {
+       counter = layers[index]->get_input_grad_compute();
+       delay_loaded = true;
++      if (generator->id == 0)
++        std::cout << "[TUTORIAL] BWD_IG[" << index <<"]" << std::endl;
+     }
+     if (counter > 0) {
+       generator->try_register_event(
+@@ -269,6 +277,83 @@ void Workload::iterate_data_parallel() {
+     return;
+   }
+ }
++void Workload::iterate_data_parallel_reorder() {
++  assert(index >= 0);
++  assert(index < SIZE);
++  check_for_sim_end();
++  if (current_state == LoopState::Forward_Pass) {
++    if (!layers[index]->is_weight_grad_comm_finished_blocking()) {
++      return;
++    }
++    if (delay_loaded == false) {
++      counter = layers[index]->get_fwd_pass_compute();
++      delay_loaded = true;
++      if (generator->id == 0)
++        std::cout << "[TUTORIAL] FWD[" << index <<"]" << std::endl;
++    }
++    if (counter > 0) {
++      generator->try_register_event(
++          this, EventType::Workload_Wait, NULL, counter);
++      return;
++    }
++    index++;
++    delay_loaded = false;
++    if (index >= SIZE) {
++      current_state = LoopState::Input_Gradient;
++      index--;
++    }
++    generator->register_event(this, EventType::General, NULL, 1);
++    return;
++  } else if (current_state == LoopState::Weight_Gradient) {
++    if (delay_loaded == false) {
++      counter = layers[index]->get_weight_grad_compute();
++      delay_loaded = true;
++      if (generator->id == 0)
++        std::cout << "[TUTORIAL] BWD_WG[" << index <<"]" << std::endl;
++    }
++    if (counter > 0) {
++      generator->try_register_event(
++          this, EventType::Workload_Wait, NULL, counter);
++      return;
++    }
++    delay_loaded = false;
++    layers[index]->issue_weight_grad_comm(
++        SchedulingPolicy::None, CollectiveBarrier::Non_Blocking);
++
++    if (index > 1) {
++      index--;
++      current_state = LoopState::Input_Gradient;
++    } else if (index == 1) {
++      index--;
++      current_state = LoopState::Weight_Gradient;
++    } else if (index == 0) {
++      if (generator->id == 0) {
++        std::cout << "pass: " << pass_counter
++                  << " finished at time: " << Sys::boostedTick() << std::endl;
++      }
++      pass_counter++;
++      current_state = LoopState::Forward_Pass;
++    }
++    generator->register_event(this, EventType::General, NULL, 1);
++    return;
++  } else if (current_state == LoopState::Input_Gradient) {
++    if (delay_loaded == false) {
++      counter = layers[index]->get_input_grad_compute();
++      delay_loaded = true;
++      if (generator->id == 0)
++        std::cout << "[TUTORIAL] BWD_IG[" << index <<"]" << std::endl;
++    }
++    if (counter > 0) {
++      generator->try_register_event(
++          this, EventType::Workload_Wait, NULL, counter);
++      return;
++    }
++    delay_loaded = false;
++    current_state = LoopState::Weight_Gradient;
++    generator->register_event(this, EventType::General, NULL, 1);
++    return;
++  }
++}
+ void Workload::iterate_hybrid_parallel_customized() {
+   assert(index >= 0);
+   assert(index < SIZE);
+@@ -1145,6 +1230,8 @@ int Workload::get_layer_numbers(std::string workload_input) {
+ ParallelismPolicy Workload::decode_parallelsim(std::string parallelism) {
+   if (parallelism == "DATA")
+     return ParallelismPolicy::Data;
++  else if (parallelism == "DATA_REORDER")
++    return ParallelismPolicy::DataReorder;
+   else if (parallelism == "HYBRID_TRANSFORMER")
+     return ParallelismPolicy::Transformer;
+   else if (parallelism == "HYBRID_TRANSFORMER_FWD_IN_BCKWD")
+@@ -1181,7 +1268,9 @@ std::map<std::string, std::vector<bool>> Workload::decode_involved_dimensions(
+     result["ig"] = all;
+     result["wg"] = all;
+   } else if (
+-      policy == ParallelismPolicy::Data || policy == ParallelismPolicy::DLRM ||
++      policy == ParallelismPolicy::Data ||
++      policy == ParallelismPolicy::DataReorder ||
++      policy == ParallelismPolicy::DLRM ||
+       policy == ParallelismPolicy::DLRMEnhanced ||
+       policy == ParallelismPolicy::MicroBenchmark) {
+     result["fwd"] = none;
+diff --git astra-sim/workload/Workload.hh astra-sim/workload/Workload.hh
+index 5e2371f..9f94221 100644
+--- astra-sim/workload/Workload.hh
++++ astra-sim/workload/Workload.hh
+@@ -34,6 +34,7 @@ namespace AstraSim {
+ enum class ParallelismPolicy {
+   MicroBenchmark,
+   Data,
++  DataReorder,
+   Transformer,
+   TransformerFwdInBckwd,
+   DLRM,
+@@ -89,6 +90,7 @@ class Workload : Callable {
+   void call(EventType event, CallData* data);
+   void iterate_micro_benchmark();
+   void iterate_data_parallel();
++  void iterate_data_parallel_reorder();
+   void iterate_hybrid_parallel_Transformer();
+   void iterate_hybrid_parallel_Transformer_fwd_in_bckwd();
+   void iterate_hybrid_parallel_DLRM();
+diff --git examples/run_ResNet50_analytical.sh examples/run_ResNet50_analytical.sh
+new file mode 100755
+index 0000000..3985512
+--- /dev/null
++++ examples/run_ResNet50_analytical.sh
+@@ -0,0 +1,24 @@
++#! /bin/bash -v
++
++# Absolue path to this script
++SCRIPT_DIR=$(dirname "$(realpath $0)")
++
++# Absolute paths to useful directories
++BINARY="${SCRIPT_DIR:?}"/../build/astra_analytical/build/AnalyticalAstra/bin/AnalyticalAstra
++NETWORK="${SCRIPT_DIR:?}"/../inputs/network/analytical/sample_Torus3D.json
++SYSTEM="${SCRIPT_DIR:?}"/../inputs/system/sample_torus_sys.txt
++WORKLOAD="${SCRIPT_DIR:?}"/../inputs/workload/Resnet50_DataParallel.txt
++STATS="${SCRIPT_DIR:?}"/results/run_ResNet50_analytical
++
++rm -rf "${STATS}"
++mkdir "${STATS}"
++
++"${BINARY}" \
++--network-configuration="${NETWORK}" \
++--system-configuration="${SYSTEM}" \
++--workload-configuration="${WORKLOAD}" \
++--path="${STATS}/" \
++--run-name="ResNet50" \
++--num-passes=2 \
++--total-stat-rows=1 \
++--stat-row=0
+diff --git examples/run_ResNet50_analytical_reorder.sh examples/run_ResNet50_analytical_reorder.sh
+new file mode 100755
+index 0000000..ecba0c2
+--- /dev/null
++++ examples/run_ResNet50_analytical_reorder.sh
+@@ -0,0 +1,24 @@
++#! /bin/bash -v
++
++# Absolue path to this script
++SCRIPT_DIR=$(dirname "$(realpath $0)")
++
++# Absolute paths to useful directories
++BINARY="${SCRIPT_DIR:?}"/../build/astra_analytical/build/AnalyticalAstra/bin/AnalyticalAstra
++NETWORK="${SCRIPT_DIR:?}"/../inputs/network/analytical/sample_Torus3D.json
++SYSTEM="${SCRIPT_DIR:?}"/../inputs/system/sample_torus_sys.txt
++WORKLOAD="${SCRIPT_DIR:?}"/../inputs/workload/Resnet50_DataParallel_Reorder.txt
++STATS="${SCRIPT_DIR:?}"/results/run_ResNet50_analytical
++
++rm -rf "${STATS}"
++mkdir "${STATS}"
++
++"${BINARY}" \
++--network-configuration="${NETWORK}" \
++--system-configuration="${SYSTEM}" \
++--workload-configuration="${WORKLOAD}" \
++--path="${STATS}/" \
++--run-name="ResNet50" \
++--num-passes=2 \
++--total-stat-rows=1 \
++--stat-row=0
+diff --git inputs/workload/Resnet50_DataParallel_Reorder.txt inputs/workload/Resnet50_DataParallel_Reorder.txt
+new file mode 100755
+index 0000000..ecf3c05
+--- /dev/null
++++ inputs/workload/Resnet50_DataParallel_Reorder.txt
+@@ -0,0 +1,56 @@
++DATA_REORDER
++54
++conv1	-1	13003	NONE	0	12864	NONE	0	32291	ALLREDUCE	37632	3229
++layer_64_1_conv4	-1	3456	NONE	0	3648	NONE	0	7488	ALLREDUCE	65536	749
++layer_64_1_conv1	-1	3456	NONE	0	3456	NONE	0	7488	ALLREDUCE	16384	749
++layer_64_1_conv2	-1	10944	NONE	0	10368	NONE	0	14144	ALLREDUCE	147456	1414
++layer_64_1_conv3	-1	3456	NONE	0	3648	NONE	0	7488	ALLREDUCE	65536	749
++layer_64_2_conv1	-1	3648	NONE	0	3456	NONE	0	9984	ALLREDUCE	65536	998
++layer_64_2_conv2	-1	10944	NONE	0	10368	NONE	0	14144	ALLREDUCE	147456	1414
++layer_64_2_conv3	-1	3456	NONE	0	3648	NONE	0	7488	ALLREDUCE	65536	749
++layer_64_3_conv1	-1	3648	NONE	0	3456	NONE	0	9984	ALLREDUCE	65536	998
++layer_64_3_conv2	-1	10944	NONE	0	10368	NONE	0	14144	ALLREDUCE	147456	1414
++layer_64_3_conv3	-1	3456	NONE	0	3648	NONE	0	7488	ALLREDUCE	65536	749
++layer_128_1_conv4	-1	2592	NONE	0	2592	NONE	0	6144	ALLREDUCE	524288	614
++layer_128_1_conv1	-1	3648	NONE	0	3520	NONE	0	9984	ALLREDUCE	131072	998
++layer_128_1_conv2	-1	6480	NONE	0	5840	NONE	0	6656	ALLREDUCE	589824	666
++layer_128_1_conv3	-1	2336	NONE	0	2592	NONE	0	5120	ALLREDUCE	262144	512
++layer_128_2_conv1	-1	2592	NONE	0	2336	NONE	0	4096	ALLREDUCE	262144	410
++layer_128_2_conv2	-1	6480	NONE	0	5840	NONE	0	6656	ALLREDUCE	589824	666
++layer_128_2_conv3	-1	2336	NONE	0	2592	NONE	0	5120	ALLREDUCE	262144	512
++layer_128_3_conv1	-1	2592	NONE	0	2336	NONE	0	4096	ALLREDUCE	262144	410
++layer_128_3_conv2	-1	6480	NONE	0	5840	NONE	0	6656	ALLREDUCE	589824	666
++layer_128_3_conv3	-1	2336	NONE	0	2592	NONE	0	5120	ALLREDUCE	262144	512
++layer_128_4_conv1	-1	2592	NONE	0	2336	NONE	0	4096	ALLREDUCE	262144	410
++layer_128_4_conv2	-1	6480	NONE	0	5840	NONE	0	6656	ALLREDUCE	589824	666
++layer_128_4_conv3	-1	3146	NONE	0	2592	NONE	0	5120	ALLREDUCE	262144	512
++layer_256_1_conv4	-1	5664	NONE	0	5664	NONE	0	3856	ALLREDUCE	2097152	386
++layer_256_1_conv1	-1	3539	NONE	0	3146	NONE	0	4096	ALLREDUCE	524288	410
++layer_256_1_conv2	-1	6372	NONE	0	6372	NONE	0	2756	ALLREDUCE	2359296	276
++layer_256_1_conv3	-1	2832	NONE	0	3539	NONE	0	2832	ALLREDUCE	1048576	283
++layer_256_2_conv1	-1	3539	NONE	0	2832	NONE	0	1476	ALLREDUCE	1048576	148
++layer_256_2_conv2	-1	6372	NONE	0	6372	NONE	0	2756	ALLREDUCE	2359296	276
++layer_256_2_conv3	-1	2832	NONE	0	3539	NONE	0	2832	ALLREDUCE	1048576	283
++layer_256_3_conv1	-1	3539	NONE	0	2832	NONE	0	1476	ALLREDUCE	1048576	148
++layer_256_3_conv2	-1	6372	NONE	0	6372	NONE	0	2756	ALLREDUCE	2359296	276
++layer_256_3_conv3	-1	2832	NONE	0	3539	NONE	0	2832	ALLREDUCE	1048576	283
++layer_256_4_conv1	-1	3539	NONE	0	2832	NONE	0	1476	ALLREDUCE	1048576	148
++layer_256_4_conv2	-1	6372	NONE	0	6372	NONE	0	2756	ALLREDUCE	2359296	276
++layer_256_4_conv3	-1	2832	NONE	0	3539	NONE	0	2832	ALLREDUCE	1048576	283
++layer_256_5_conv1	-1	3539	NONE	0	2832	NONE	0	1476	ALLREDUCE	1048576	148
++layer_256_5_conv2	-1	6372	NONE	0	6372	NONE	0	2756	ALLREDUCE	2359296	276
++layer_256_5_conv3	-1	2832	NONE	0	3539	NONE	0	2832	ALLREDUCE	1048576	283
++layer_256_6_conv1	-1	3539	NONE	0	2832	NONE	0	1476	ALLREDUCE	1048576	148
++layer_256_6_conv2	-1	6372	NONE	0	6372	NONE	0	2756	ALLREDUCE	2359296	276
++layer_256_6_conv3	-1	12583	NONE	0	3539	NONE	0	2832	ALLREDUCE	1048576	283
++layer_512_1_conv4	-1	17952	NONE	0	17952	NONE	0	10632	ALLREDUCE	8388608	1063
++layer_512_1_conv1	-1	14156	NONE	0	12583	NONE	0	2952	ALLREDUCE	2097152	295
++layer_512_1_conv2	-1	20196	NONE	0	20196	NONE	0	9826	ALLREDUCE	9437184	983
++layer_512_1_conv3	-1	8976	NONE	0	14156	NONE	0	6536	ALLREDUCE	4194304	654
++layer_512_2_conv1	-1	14156	NONE	0	8976	NONE	0	4706	ALLREDUCE	4194304	471
++layer_512_2_conv2	-1	20196	NONE	0	20196	NONE	0	9826	ALLREDUCE	9437184	983
++layer_512_2_conv3	-1	8976	NONE	0	14156	NONE	0	6536	ALLREDUCE	4194304	654
++layer_512_3_conv1	-1	14156	NONE	0	8976	NONE	0	4706	ALLREDUCE	4194304	471
++layer_512_3_conv2	-1	20196	NONE	0	20196	NONE	0	9826	ALLREDUCE	9437184	983
++layer_512_3_conv3	-1	12288	NONE	0	14156	NONE	0	6536	ALLREDUCE	4194304	654
++fc1000	-1	16416	NONE	0	27708	NONE	0	9220	ALLREDUCE	8192000	922
