@@ -22,7 +22,7 @@ mkdir -p ${RESULT_DIR}
     --network-configuration="${NETWORK}" \
     --system-configuration="${SYSTEM}" \
     --workload-configuration="${WORKLOAD}" \
-    --path="${RESULT_DIR}" \
+    --path="${RESULT_DIR}/" \
     --run-name "exercise_0" \
     --num-passes 1 \
     --total-stat-rows 1 \
