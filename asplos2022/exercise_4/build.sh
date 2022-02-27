@@ -6,11 +6,10 @@ BUILD_DIR="${SCRIPT_DIR}/../build"
 ANALYTICAL_DIR="${SCRIPT_DIR}/../astra-sim/build/astra_analytical"
 
 # Setup
-cd astra-sim/
+cd "${SCRIPT_DIR}/../astra-sim/"
 git clean -xdf .
 git checkout .
-cd ..
-cp -r ./exercise_4/astra-sim/ astra-sim/
+cp -r "${SCRIPT_DIR}/astra-sim/" "${SCRIPT_DIR}/../astra-sim/"
 rm -rf ${BUILD_DIR}
 mkdir -p ${BUILD_DIR}
 
