@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+# Path
 SCRIPT_DIR=$(dirname "$(realpath $0)")
 
 # 1. Clone ASTRA-sim

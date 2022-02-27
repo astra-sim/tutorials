@@ -1,1 +1,11 @@
-astra-sim
+# ASTRA-sim
+astra-sim/
+
+# ASTRA-sim build
+build/
+
+# Results
+exercise_0/result/
+exercise_1/result/
+exercise_2/result/
+exercise_3/result/
