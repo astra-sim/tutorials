@@ -19,7 +19,7 @@ mkdir -p ${RESULT_DIR}
 
 # 2. Run ASTRA-sim
 "${BINARY}" \
-    --run-name="exercise_0" \
+    --run-name="Exercise 1" \
     --network-configuration="${NETWORK}" \
     --system-configuration="${SYSTEM}" \
     --workload-configuration="${WORKLOAD}" \
