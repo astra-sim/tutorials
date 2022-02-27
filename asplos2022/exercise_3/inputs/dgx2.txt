@@ -1,0 +1,10 @@
+scheduling-policy: LIFO
+endpoint-delay: 10
+active-chunks-per-dimension: 1
+preferred-dataset-splits: 4
+boost-mode: 1
+all-reduce-implementation: halvingDoubling_halvingDoubling
+all-gather-implementation: halvingDoubling_halvingDoubling
+reduce-scatter-implementation: halvingDoubling_halvingDoubling
+all-to-all-implementation: direct_direct
+collective-optimization: localBWAware
