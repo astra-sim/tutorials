@@ -19,16 +19,8 @@ mkdir -p ${RESULT_DIR}
 
 # 2. Run ASTRA-sim
 "${BINARY}" \
+    --run-name="exercise_0" \
     --network-configuration="${NETWORK}" \
     --system-configuration="${SYSTEM}" \
     --workload-configuration="${WORKLOAD}" \
-    --path="${RESULT_DIR}/" \
-    --run-name "exercise_0" \
-    --num-passes 1 \
-    --total-stat-rows 1 \
-    --stat-row 0 \
-    --compute-scale 1 \
-    --comm-scale 1 \
-    --num-queues-per-dim 1 \
-    --injection-scale 1 \
-    --rendezvous-protocol false
+    --path="${RESULT_DIR}/"

@@ -8,5 +8,3 @@ all-gather-implementation: ring
 reduce-scatter-implementation: ring
 all-to-all-implementation: direct
 collective-optimization: localBWAware
-intra-dimension-scheduling: FIFO
-inter-dimension-scheduling: ascending
