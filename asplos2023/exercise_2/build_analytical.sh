@@ -2,7 +2,7 @@
 set -e
 
 SCRIPT_DIR="$(dirname "$(realpath $0)")"
-BUILD_DIR="${SCRIPT_DIR}/../build"
+BUILD_DIR="${SCRIPT_DIR}/../build/analytical"
 ANALYTICAL_DIR="${SCRIPT_DIR}/../astra-sim/build/astra_analytical"
 NUM_THREADS=$(nproc)
 

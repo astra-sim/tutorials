@@ -3,8 +3,7 @@ set -e
 
 # Path
 SCRIPT_DIR="$(dirname "$(realpath $0)")"
-BINARY="${SCRIPT_DIR}/../build/AnalyticalAstra/bin/AnalyticalAstra"
-ANALYTICAL_DIR="${SCRIPT_DIR}/../astra-sim/build/astra_analytical"
+BINARY="${SCRIPT_DIR}/../build/analytical/AnalyticalAstra/bin/AnalyticalAstra"
 RESULT_DIR="${SCRIPT_DIR}/result_1"
 
 # Inputs
