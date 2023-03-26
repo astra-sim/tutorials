@@ -1,0 +1,5 @@
+# Network Configuration
+topology: Switch
+npus_count: [64]
+bandwidth: [50]
+latency: [500]
