@@ -1,0 +1,8 @@
+{
+  "dimensions-count": 2,
+  "topologies-per-dim": ["Ring", "Ring"],
+  "units-count": [16, 16],
+  "links-count": [2, 2],
+  "link-latency": [500, 500],
+  "link-bandwidth": [62, 62]
+}

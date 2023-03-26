@@ -7,7 +7,6 @@ import os
 def main():
     # read tutorial_result.csv
     df = pd.read_csv('./result_1-3/tutorial_result.csv')
-    print(df.head(10).to_string())
 
     # create a plot
     sns.set(font_scale=1.5, rc={'font.weight': 'bold'})
@@ -26,6 +25,9 @@ def main():
     fig.savefig(os.path.join('./result_1-3', 'plot_1-3.pdf'))
     fig.clf()
     plt.close(fig=fig)
+
+    # show the log
+    print("Result saved at ./result_1-3")
 
 
 if __name__ == '__main__':
