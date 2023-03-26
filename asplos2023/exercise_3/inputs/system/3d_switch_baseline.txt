@@ -1,7 +1,7 @@
 scheduling-policy: LIFO
 endpoint-delay: 10
 active-chunks-per-dimension: 1
-preferred-dataset-splits: 4
+preferred-dataset-splits: 64
 boost-mode: 1
 all-reduce-implementation: halvingDoubling_halvingDoubling_halvingDoubling
 all-gather-implementation: halvingDoubling_halvingDoubling_halvingDoubling
