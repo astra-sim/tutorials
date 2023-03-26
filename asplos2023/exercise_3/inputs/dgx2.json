@@ -1,8 +1,0 @@
-{
-  "dimensions-count": 2,
-  "topologies-per-dim": ["Switch", "Switch"],
-  "units-count": [16, 16],
-  "links-count": [6, 1],
-  "link-latency": [500, 500],
-  "link-bandwidth": [25, 6.25]
-}
