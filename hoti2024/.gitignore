@@ -1,0 +1,10 @@
+# ASTRA-sim
+astra-sim/
+
+# ASTRA-sim build
+build/
+
+# Results
+demo1/allreduce
+demo1/3nodes
+demo1/*.pdf
