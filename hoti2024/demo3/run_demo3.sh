@@ -10,6 +10,6 @@ ASTRA_SIM=${SCRIPT_DIR}/../astra-sim/build/astra_analytical/build/bin/AstraSim_A
 ${ASTRA_SIM} \
     --workload-configuration=${SCRIPT_DIR}/chakra_traces/et \
     --system-configuration=${SCRIPT_DIR}/inputs/Ring_sys.json \
-    --network-configuration=${SCRIPT_DIR}/inputs/Ring_2.yml \
+    --network-configuration=${SCRIPT_DIR}/inputs/FullyConnected_2.yml \
     --remote-memory-configuration=${SCRIPT_DIR}/inputs/RemoteMemory.json
 )
