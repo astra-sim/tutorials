@@ -11,3 +11,8 @@ cd ${SCRIPT_DIR}/astra-sim/
 git checkout tags/tutorial-hoti2024
 git submodule update --init --recursive
 )
+
+# Create Chakra symlink for easy access
+(
+ln -s ${SCRIPT_DIR}/astra-sim/extern/graph_frontend/chakra .
+)
