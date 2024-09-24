@@ -1,5 +1,5 @@
 ## Use Ubuntu
-FROM ubuntu:24.04
+FROM ubuntu:22.04
 LABEL maintainer="Will Won <william.won@gatech.edu>"
 
 
@@ -13,8 +13,9 @@ RUN apt -y install \
     gcc g++ clang-format \
     make cmake \
     libboost-dev libboost-program-options-dev \
-    python3.12 python3-pip python3-venv \
-    graphviz
+    python3.11 python3-pip python3-venv \
+    graphviz \
+    openmpi-bin openmpi-doc libopenmpi-dev
 
 ## Create Python venv: Required for Python 3.12
 RUN python3 -m venv /opt/venv/astra-sim

@@ -4,7 +4,7 @@ set -e
 # Path
 SCRIPT_DIR=$(dirname "$(realpath $0)")
 
-# Install Chakra
+# Compile ASTRA-sim with analytical model
 (
 cd ${SCRIPT_DIR}/astra-sim/build/astra_analytical
 ./build.sh
