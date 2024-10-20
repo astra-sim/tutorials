@@ -1,0 +1,10 @@
+{
+    "scheduling-policy": "LIFO",
+    "endpoint-delay": 10,
+    "active-chunks-per-dimension": 1,
+    "preferred-dataset-splits": 4,
+    "all-reduce-implementation-chakra": ["/app/hoti2024/demo5/inputs/custom_ring"],
+    "collective-optimization": "localBWAware",
+    "local-mem-bw": 50,
+    "boost-mode": 0
+}
