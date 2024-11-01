@@ -1,0 +1,23 @@
+# ASTRA-sim
+astra-sim/
+
+# ASTRA-sim build
+build/
+
+# Symlink
+chakra
+
+# Demo 1
+demo1/allreduce
+demo1/3nodes
+demo1/*.pdf
+
+# Demo 2
+demo2/workload_chakra/
+demo2/*.pdf
+demo2/*.log
+
+# Demo 3
+demo3/chakra_traces/
+demo3/etplus_traces/
+demo3/*.log
