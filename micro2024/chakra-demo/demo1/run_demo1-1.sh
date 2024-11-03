@@ -3,13 +3,11 @@ set -e
 
 # Path
 SCRIPT_DIR=$(dirname "$(realpath $0)")
-ASTRA_SIM=${SCRIPT_DIR}/../astra-sim/build/astra_analytical/build/bin/AstraSim_Analytical_Congestion_Aware
+CHAKRA=${SCRIPT_DIR}/../chakra
 
-# Run ASTRA-sim
+# Run CHAKRA ET Generator
 (
-${ASTRA_SIM} \
-    --workload-configuration=${SCRIPT_DIR}/allreduce/allreduce \
-    --system-configuration=${SCRIPT_DIR}/inputs/Ring_sys.json \
-    --network-configuration=${SCRIPT_DIR}/inputs/Ring_8.yml \
-    --remote-memory-configuration=${SCRIPT_DIR}/inputs/RemoteMemory.json
+mkdir ${SCRIPT_DIR}/traces
+cd ${SCRIPT_DIR}/traces
+chakra_generator --num_npus 8
 )

@@ -3,7 +3,7 @@ set -e
 
 # Path
 SCRIPT_DIR=$(dirname "$(realpath $0)")
-STG=${SCRIPT_DIR}/../symbolic_tensor_graph
+STG=${SCRIPT_DIR}/../../symbolic_tensor_graph
 
 # Run Symbolic Tensor Graph (STG) Generator
 (

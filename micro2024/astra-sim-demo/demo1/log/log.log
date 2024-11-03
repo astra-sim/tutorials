@@ -1,0 +1,24 @@
+[2024-11-03 08:05:06.442] [system::topology::RingTopology] [info] ring of node 0, id: 0 dimension: local total nodes in ring: 8 index in ring: 0 offset: 1 total nodes in ring: 8
+[2024-11-03 08:05:06.442] [system::topology::RingTopology] [info] ring of node 0, id: 0 dimension: local total nodes in ring: 8 index in ring: 0 offset: 1 total nodes in ring: 8
+[2024-11-03 08:05:06.442] [system::topology::RingTopology] [info] ring of node 0, id: 0 dimension: local total nodes in ring: 8 index in ring: 0 offset: 1 total nodes in ring: 8
+[2024-11-03 08:05:06.442] [system::topology::RingTopology] [info] ring of node 0, id: 0 dimension: local total nodes in ring: 8 index in ring: 0 offset: 1 total nodes in ring: 8
+[2024-11-03 08:05:06.443] [workload] [info] sys[0] finished, 28600 cycles, exposed communication 28600 cycles.
+[2024-11-03 08:05:06.443] [workload] [info] sys[1] finished, 28600 cycles, exposed communication 28600 cycles.
+[2024-11-03 08:05:06.443] [workload] [info] sys[2] finished, 28600 cycles, exposed communication 28600 cycles.
+[2024-11-03 08:05:06.443] [workload] [info] sys[3] finished, 28600 cycles, exposed communication 28600 cycles.
+[2024-11-03 08:05:06.443] [workload] [info] sys[4] finished, 28600 cycles, exposed communication 28600 cycles.
+[2024-11-03 08:05:06.443] [workload] [info] sys[5] finished, 28600 cycles, exposed communication 28600 cycles.
+[2024-11-03 08:05:06.443] [workload] [info] sys[6] finished, 28600 cycles, exposed communication 28600 cycles.
+[2024-11-03 08:05:06.443] [workload] [info] sys[7] finished, 28600 cycles, exposed communication 28600 cycles.
+[2024-11-03 08:05:09.454] [system::topology::RingTopology] [info] ring of node 0, id: 0 dimension: local total nodes in ring: 8 index in ring: 0 offset: 1 total nodes in ring: 8
+[2024-11-03 08:05:09.454] [system::topology::RingTopology] [info] ring of node 0, id: 0 dimension: local total nodes in ring: 8 index in ring: 0 offset: 1 total nodes in ring: 8
+[2024-11-03 08:05:09.454] [system::topology::RingTopology] [info] ring of node 0, id: 0 dimension: local total nodes in ring: 8 index in ring: 0 offset: 1 total nodes in ring: 8
+[2024-11-03 08:05:09.454] [system::topology::RingTopology] [info] ring of node 0, id: 0 dimension: local total nodes in ring: 8 index in ring: 0 offset: 1 total nodes in ring: 8
+[2024-11-03 08:05:09.455] [workload] [info] sys[0] finished, 4120 cycles, exposed communication 4120 cycles.
+[2024-11-03 08:05:09.455] [workload] [info] sys[1] finished, 4120 cycles, exposed communication 4120 cycles.
+[2024-11-03 08:05:09.455] [workload] [info] sys[2] finished, 4120 cycles, exposed communication 4120 cycles.
+[2024-11-03 08:05:09.455] [workload] [info] sys[3] finished, 4120 cycles, exposed communication 4120 cycles.
+[2024-11-03 08:05:09.455] [workload] [info] sys[4] finished, 4120 cycles, exposed communication 4120 cycles.
+[2024-11-03 08:05:09.455] [workload] [info] sys[5] finished, 4120 cycles, exposed communication 4120 cycles.
+[2024-11-03 08:05:09.455] [workload] [info] sys[6] finished, 4120 cycles, exposed communication 4120 cycles.
+[2024-11-03 08:05:09.455] [workload] [info] sys[7] finished, 4120 cycles, exposed communication 4120 cycles.
