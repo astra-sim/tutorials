@@ -6,23 +6,23 @@ SCRIPT_DIR=$(dirname "$(realpath $0)")
 
 # Clone ASTRA-sim
 (
-git clone git@github.com:astra-sim/astra-sim.git
+git clone https://github.com/astra-sim/astra-sim.git
 cd ${SCRIPT_DIR}/astra-sim/
-git checkout tags/tutorial-hoti2024
+git checkout tags/tutorial-micro2024
 git submodule update --init --recursive
 )
 
-# Clone Chakra
+# Create Chakra symlink for easy access
 (
-git clone https://github.com/astra-sim/chakra.git
+ln -s astra-sim/extern/graph_frontend/chakra .
 )
 
 # Clone Param (required for real system trace conversion)
 (
-git clone git@github.com:facebookresearch/param.git
+git clone https://github.com/facebookresearch/param.git
 )
 
-# Clone Holictic Trace Analysis (required for Ciritical Path Analysis)
+# Clone Symbolic Tensor Graph (STG) Generator
 (
-git clone https://github.com/facebookresearch/HolisticTraceAnalysis.git
+git clone https://github.com/astra-sim/symbolic_tensor_graph
 )
