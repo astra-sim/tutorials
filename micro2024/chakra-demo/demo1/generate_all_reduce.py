@@ -36,7 +36,7 @@ def main() -> None:
             # assign attributes
             node.attr.append(ChakraAttr(name="is_cpu_op", bool_val=False))
             node.attr.append(ChakraAttr(name="comm_type", int64_val=ALL_REDUCE))
-            node.attr.append(ChakraAttr(name="comm_size", uint64_val=coll_size))
+            node.attr.append(ChakraAttr(name="comm_size", int64_val=coll_size))
             node.attr.append(ChakraAttr(name="involved_dim", bool_list=BoolList(values=[True])))
 
             # store Chakra ET file
