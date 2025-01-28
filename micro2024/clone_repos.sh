@@ -8,7 +8,7 @@ SCRIPT_DIR=$(dirname "$(realpath $0)")
 (
 git clone https://github.com/astra-sim/astra-sim.git
 cd ${SCRIPT_DIR}/astra-sim/
-git checkout tags/tutorial-micro2024
+git checkout tags/tutorial-micro2024-ns3fix250128
 git submodule update --init --recursive
 )
 

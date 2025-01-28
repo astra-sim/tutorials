@@ -11,7 +11,7 @@ ASTRA_SIM=./ns3.42-AstraSimNetwork-default
 cd ${ASTRA_SIM_BUILD_DIR}
 touch ../../scratch/output/flow.txt
 ${ASTRA_SIM} \
-    --workload-configuration=${SCRIPT_DIR}/allreduce_2D/allreduce \
+    --workload-configuration=${SCRIPT_DIR}/allreduce_2D/allreduce_128/allreduce \
     --system-configuration=${SCRIPT_DIR}/inputs/Ring_Ring_sys.json \
     --remote-memory-configuration=${SCRIPT_DIR}/inputs/RemoteMemory.json \
     --logical-topology-configuration=${SCRIPT_DIR}/inputs/logical_128nodes_2D.json \
