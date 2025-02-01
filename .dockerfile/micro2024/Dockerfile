@@ -13,6 +13,7 @@ RUN apt -y install \
     gcc g++ clang-format \
     make cmake \
     libboost-dev libboost-program-options-dev \
+    openmpi-bin openmpi-doc libopenmpi-dev \
     python3.12 python3-pip python3-venv \
     graphviz
 
@@ -62,6 +63,9 @@ ENV protobuf_DIR="/opt/protobuf-25.3/install"
 
 # Also, install Python protobuf package
 RUN pip3 install protobuf==4.25.3
+
+# Refer to astra-sim/CMakeLists.txt
+ENV PROTOBUF_FROM_SOURCE="True"
 ### ======================================================
 
 
