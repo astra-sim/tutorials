@@ -13,8 +13,8 @@ from chakra.schema.protobuf.et_def_pb2 import (
 
 def main() -> None:
     # create directories
-    if not os.path.exists("./allreduce"):
-        os.makedirs("./allreduce")
+    if not os.path.exists("./allreduce_1D"):
+        os.makedirs("./allreduce_1D")
     
 
     # metadata
@@ -22,7 +22,7 @@ def main() -> None:
     coll_size = 1_048_576  # 1 MB
 
     for npu_id in range(npus_count):
-        output_filename = f"allreduce/allreduce.{npu_id}.et"
+        output_filename = f"allreduce_1D/allreduce.{npu_id}.et"
         with open(output_filename, "wb") as et:
             # Chakra Metadata
             encode_message(et, GlobalMetadata(version="0.0.4"))
@@ -36,7 +36,7 @@ def main() -> None:
             # assign attributes
             node.attr.append(ChakraAttr(name="is_cpu_op", bool_val=False))
             node.attr.append(ChakraAttr(name="comm_type", int64_val=ALL_REDUCE))
-            node.attr.append(ChakraAttr(name="comm_size", uint64_val=coll_size))
+            node.attr.append(ChakraAttr(name="comm_size", int64_val=coll_size))
             node.attr.append(ChakraAttr(name="involved_dim", bool_list=BoolList(values=[True])))
 
             # store Chakra ET file
